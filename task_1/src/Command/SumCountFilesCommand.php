@@ -36,7 +36,7 @@ final class SumCountFilesCommand extends Command
             return Command::FAILURE;
         }
 
-        $directories = $this->excludedRecurringDirectories(
+        $directories = $this->excludeRecurringDirectories(
             $this->makeAbsoluteDirectoryPaths($directories)
         );
 
@@ -75,7 +75,7 @@ final class SumCountFilesCommand extends Command
     /**
      *  Example: ['./test', './test/test_1'] => ['./test']
      */
-    private function excludedRecurringDirectories(array $directories): array
+    private function excludeRecurringDirectories(array $directories): array
     {
         $directoryPaths = array_map(static function (string $directory): array {
             return explode(DIRECTORY_SEPARATOR, $directory);
