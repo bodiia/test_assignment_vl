@@ -77,19 +77,19 @@ final class SumCountFilesCommand extends Command
      */
     private function excludeRecurringDirectories(array $directories): array
     {
-        $directoryPaths = array_map(static function (string $directory): array {
+        $explodedDirectoryPaths = array_map(static function (string $directory): array {
             return explode(DIRECTORY_SEPARATOR, $directory);
         }, $directories);
 
-        usort($directoryPaths, static function (array $a, array $b): int {
+        usort($explodedDirectoryPaths, static function (array $a, array $b): int {
             return count($a) <=> count($b);
         });
 
         $excluded = [];
-        for ($i = 0; $i < count($directoryPaths); $i++) {
-            for ($j = $i + 1; $j < count($directoryPaths); $j++) {
-                if (empty(array_diff($directoryPaths[$i], $directoryPaths[$j]))) {
-                    $excluded[] = implode(DIRECTORY_SEPARATOR, $directoryPaths[$j]);
+        for ($i = 0; $i < count($explodedDirectoryPaths); $i++) {
+            for ($j = $i + 1; $j < count($explodedDirectoryPaths); $j++) {
+                if (empty(array_diff($explodedDirectoryPaths[$i], $explodedDirectoryPaths[$j]))) {
+                    $excluded[] = implode(DIRECTORY_SEPARATOR, $explodedDirectoryPaths[$j]);
                 }
             }
         }
