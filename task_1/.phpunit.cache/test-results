@@ -1,0 +1,1 @@
+{"version":1,"defects":{"SumCountFilesCommandTest::testWithNonExistDirectories":7,"SumCountFilesCommandTest::testWithRecurringDirectories":5},"times":{"SumCountFilesCommandTest::testExample":0.002,"SumCountFilesCommandTest::testSuccessfullyExecute":0.025,"SumCountFilesCommandTest::testWithNonExistDirectories":0.001,"SumCountFilesCommandTest::testWithRecurringDirectories":0}}
