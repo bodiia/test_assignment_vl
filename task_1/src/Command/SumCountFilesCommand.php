@@ -54,9 +54,6 @@ final class SumCountFilesCommand extends Command
         return $directoryPaths;
     }
 
-    /**
-     *  Example: ['./test', './test/test_1'] => ['./test']
-     */
     private function excludeRecurringDirectories(array $directories): array
     {
         $explodedDirectoryPaths = array_map(static function (string $directory): array {
@@ -99,7 +96,7 @@ final class SumCountFilesCommand extends Command
 
         /** @var \SplFileInfo $fileInfo */
         foreach ($directoryIterator as $fileInfo) {
-            if ($fileInfo->isFile() && ! $fileInfo->isLink() && in_array(basename($fileInfo->getPathname()), $filenames)) {
+            if ($fileInfo->isFile() && in_array(basename($fileInfo->getPathname()), $filenames)) {
                 $files[] = $fileInfo;
             }
         }

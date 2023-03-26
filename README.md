@@ -6,6 +6,19 @@ git clone https://github.com/bodiia/test_assignment_vl.git <directory>
 ```
 ## Task 1
 
+Так как в условии задания не указан формат содержимого файла, то я предположил следующий:
+```shell
+1 2
+3 -2 asd sd2
+```
+Отрицательные числа так же будут учитываться при подсчёте.
+
+Так как использую рекурсивный итератор, то переданные директории консольной команде фильтруются на вложенность друг в друга, вложенные директори
+отбрасываются и оставляют только корневую.
+```shell
+['./test', './test/test_1', './test/test_2'] => ['./test']
+```
+
 ```shell
 cd <directory>/task_1
 
@@ -31,7 +44,7 @@ docker build -t comments:latest ./
 docker run --rm -t comments php ./vendor/bin/phpunit
 ```
 
-Usage example
+### Usage example
 
 ```php
 
