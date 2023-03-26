@@ -30,3 +30,28 @@ docker build -t comments:latest ./
 #Run Tests
 docker run --rm -t comments php ./vendor/bin/phpunit
 ```
+
+Usage example
+
+```php
+
+class ExampleService
+{
+    public function __construct(
+        private readonly \TestAssignment\Client\CommentsClientInterface $client
+    ) {
+    }
+    
+    public function method(): ...
+    {
+        try {
+            /** @var Comment[] */
+            $comments = $this->client->get();
+        } catch (\TestAssignment\Exception\ApiException $e) {
+            ...
+        }
+    } 
+}
+
+$service = new ExampleService(new \TestAssignment\Client\CommentsClient());
+```
