@@ -33,7 +33,7 @@ final class SumCountFilesCommand extends Command
         $directories = $this->excludeRecurringDirectories($this->makeAbsoluteDirectoryPaths($directories));
 
         try {
-            $result = $this->getTotalSumOfNumbersInFiles($this->getFilesFromDirectories($directories));
+            $result = $this->getTotalSumOfNumbersInFiles($this->getFilesFromDirectories($directories, ['count']));
         } catch (\InvalidArgumentException $exception) {
             $output->writeln($exception->getMessage());
 
@@ -81,7 +81,7 @@ final class SumCountFilesCommand extends Command
     /**
      * @return \SplFileInfo[]
      */
-    private function getFilesFromDirectories(array $directories): array
+    private function getFilesFromDirectories(array $directories, array $filenames): array
     {
         $files = [];
 
@@ -99,11 +99,11 @@ final class SumCountFilesCommand extends Command
 
         /** @var \SplFileInfo $fileInfo */
         foreach ($directoryIterator as $fileInfo) {
-            if ($fileInfo->isFile() && ! $fileInfo->isLink() && basename($fileInfo->getPathname()) === 'count') {
+            if ($fileInfo->isFile() && ! $fileInfo->isLink() && in_array(basename($fileInfo->getPathname()), $filenames)) {
                 $files[] = $fileInfo;
             }
         }
-        return [...$files, ...$this->getFilesFromDirectories($directories)];
+        return [...$files, ...$this->getFilesFromDirectories($directories, $filenames)];
     }
 
     /**

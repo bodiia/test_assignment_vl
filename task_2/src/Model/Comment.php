@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace TestAssignment\DTO;
+namespace TestAssignment\Model;
 
-final class CommentDto extends BaseDto
+final class Comment
 {
     public function __construct(
         private readonly ?int $id,

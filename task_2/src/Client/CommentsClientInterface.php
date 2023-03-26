@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace TestAssignment\Client;
 
-use TestAssignment\DTO\CommentDto;
+use TestAssignment\Model\Comment;
 
 interface CommentsClientInterface
 {
     /**
-     * @return CommentDto[]
+     * @return Comment[]
      */
     public function get(array $query = []): array;
 
-    public function create(CommentDto $dto): CommentDto;
+    public function create(array $fields): Comment;
 
-    public function update(CommentDto $dto): CommentDto;
+    public function update(int $id, array $fields): Comment;
 }
