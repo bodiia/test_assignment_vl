@@ -39,7 +39,7 @@ final class SumCountFilesCommandTest extends KernelTestCase
         ]);
 
         $this->commandTester->assertCommandIsSuccessful();
-        $this->assertStringContainsString('Result: 8', $this->commandTester->getDisplay());
+        $this->assertStringContainsString('Result: 10', $this->commandTester->getDisplay());
     }
 
     public function testWithNonExistDirectories(): void

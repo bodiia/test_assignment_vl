@@ -117,6 +117,10 @@ final class SumCountFilesCommand extends Command
 
     private function getSumOfNumbersInFileContents(string $content): int
     {
-        return array_sum(explode(PHP_EOL, $content));
+        $sumInLines = array_map(static function (string $line): int {
+            return array_sum(explode(" ", $line));
+        }, explode(PHP_EOL, $content));
+
+        return array_sum($sumInLines);
     }
 }
