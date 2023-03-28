@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace TestAssignment\Model;
 
-final class Comment
+final readonly class Comment
 {
     public function __construct(
-        private readonly ?int $id,
-        private readonly string $name,
-        private readonly string $text
+        private ?int $id,
+        private string $name,
+        private string $text
     ) {
     }
 

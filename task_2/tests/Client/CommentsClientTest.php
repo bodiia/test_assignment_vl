@@ -14,9 +14,7 @@ use PHPUnit\Framework\TestCase;
 use TestAssignment\Client\CommentsClient;
 use TestAssignment\Client\CommentsClientInterface;
 use TestAssignment\Exception\ApiException;
-use TestAssignment\Hydrator\Hydrator;
 use TestAssignment\Model\Comment;
-use TestAssignment\Schema\JsonStatuses;
 
 /**
  * @covers CommentsClient
@@ -27,8 +25,6 @@ final class CommentsClientTest extends TestCase
 
     private CommentsClientInterface $commentsClient;
 
-    private Hydrator $hydrator;
-
     protected function setUp(): void
     {
         $this->mockHandler = new MockHandler();
@@ -36,7 +32,6 @@ final class CommentsClientTest extends TestCase
         $this->commentsClient = new CommentsClient(
             new Client(['handler' => $handlerStack, RequestOptions::HTTP_ERRORS => false])
         );
-        $this->hydrator = new Hydrator();
     }
 
     public function testGetComments(): void
@@ -47,16 +42,21 @@ final class CommentsClientTest extends TestCase
         ];
 
         $json = [
-            'status' => JsonStatuses::SUCCESS->value,
+            'status' => 'success',
             'data' => $expected
         ];
 
         $this->mockHandler->append(new Response(200, [], json_encode($json)));
 
-        $this->assertEquals(
-            $this->hydrator->hydrateObjects(Comment::class, $expected),
-            $this->commentsClient->get(),
-        );
+        $comments = $this->commentsClient->get();
+
+        $this->assertEquals($expected[0]['id'], $comments[0]->getId());
+        $this->assertEquals($expected[0]['text'], $comments[0]->getText());
+        $this->assertEquals($expected[0]['name'], $comments[0]->getName());
+
+        $this->assertEquals($expected[1]['id'], $comments[1]->getId());
+        $this->assertEquals($expected[1]['text'], $comments[1]->getText());
+        $this->assertEquals($expected[1]['name'], $comments[1]->getName());
     }
 
     public function testCreateComment(): void
@@ -66,35 +66,36 @@ final class CommentsClientTest extends TestCase
         $attributes = ['name' => 'test', 'text' => 'test'];
 
         $json = [
-            'status' => JsonStatuses::SUCCESS->value,
+            'status' => 'success',
             'data' => $expected
         ];
 
         $this->mockHandler->append(new Response(200, [], json_encode($json)));
 
-        $this->assertEquals(
-            $this->hydrator->hydrateObject(Comment::class, $expected),
-            $this->commentsClient->create($attributes),
-        );
+        $comment = $this->commentsClient->create($attributes);
+
+        $this->assertEquals($expected['id'], $comment->getId());
+        $this->assertEquals($expected['text'], $comment->getText());
+        $this->assertEquals($expected['name'], $comment->getName());
     }
 
     public function testUpdateComment(): void
     {
-        $expected = ['id' => 1, 'name' => 'test', 'text' => 'test'];
+        $comment = ['id' => 1, 'name' => 'test', 'text' => 'test'];
 
-        $attributes = ['name' => 'test', 'text' => 'test'];
+        $attributes = ['name' => 'test_1', 'text' => 'test_1'];
 
         $json = [
-            'status' => JsonStatuses::SUCCESS->value,
-            'data' => $expected
+            'status' => 'success',
+            'data' => [...$comment, ...$attributes]
         ];
 
         $this->mockHandler->append(new Response(200, [], json_encode($json)));
 
-        $this->assertEquals(
-            $this->hydrator->hydrateObject(Comment::class, $expected),
-            $this->commentsClient->update($expected['id'], $attributes),
-        );
+        $updatedComment = $this->commentsClient->update($comment['id'], $attributes);
+
+        $this->assertEquals($attributes['name'], $updatedComment->getName());
+        $this->assertEquals($attributes['text'], $updatedComment->getText());
     }
 
     #[DataProvider('responsesForTriggerException')]
@@ -116,7 +117,7 @@ final class CommentsClientTest extends TestCase
             [
                 function (): void {
                     $json = [
-                        'status' => JsonStatuses::FAILED->value,
+                        'status' => 'failed',
                         'data' => []
                     ];
                     $this->mockHandler->append(new Response(200, [], json_encode($json)));

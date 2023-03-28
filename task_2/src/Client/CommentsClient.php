@@ -10,15 +10,10 @@ use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
 use TestAssignment\Exception\ApiException;
 use TestAssignment\Model\Comment;
-use TestAssignment\Hydrator\Hydrator;
-use TestAssignment\Schema\JsonSchema;
-use TestAssignment\Schema\JsonStatuses;
 
-final class CommentsClient implements CommentsClientInterface
+final readonly class CommentsClient implements CommentsClientInterface
 {
-    private readonly Hydrator $hydrator;
-
-    private readonly ClientInterface $httpClient;
+    private ClientInterface $httpClient;
 
     public function __construct(?ClientInterface $httpClient)
     {
@@ -27,7 +22,6 @@ final class CommentsClient implements CommentsClientInterface
         ];
 
         $this->httpClient = $httpClient ?? new Client($config);
-        $this->hydrator = new Hydrator();
     }
 
     public function get(array $query = []): array
@@ -40,7 +34,13 @@ final class CommentsClient implements CommentsClientInterface
             $this->httpClient->get('/comments', $options)
         );
 
-        return $this->hydrator->hydrateObjects(Comment::class, $comments);
+        return array_map(static function ($comment) {
+            return new Comment(
+                $comment['id'],
+                $comment['name'],
+                $comment['text']
+            );
+        }, $comments);
     }
 
     public function create(array $fields): Comment
@@ -56,10 +56,11 @@ final class CommentsClient implements CommentsClientInterface
             $this->httpClient->post('/comment', $options)
         );
 
-        /** @var Comment $comment */
-        $comment = $this->hydrator->hydrateObject(Comment::class, $raw);
-
-        return $comment;
+        return new Comment(
+            $raw['id'],
+            $raw['name'],
+            $raw['text']
+        );
     }
 
     public function update(int $id, array $fields): Comment
@@ -75,10 +76,11 @@ final class CommentsClient implements CommentsClientInterface
             $this->httpClient->put("/comment/$id", $options)
         );
 
-        /** @var Comment $comment */
-        $comment = $this->hydrator->hydrateObject(Comment::class, $raw);
-
-        return $comment;
+        return new Comment(
+            $raw['id'],
+            $raw['name'],
+            $raw['text']
+        );
     }
 
     private function handleResponse(ResponseInterface $response): array
@@ -88,17 +90,15 @@ final class CommentsClient implements CommentsClientInterface
         }
 
         try {
-            $json = new JsonSchema(
-                json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR)
-            );
+            $json = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException) {
             throw new ApiException("Invalid json schema.", $response);
         }
 
-        if ($json->getStatus() === JsonStatuses::FAILED) {
+        if ($json['status'] === 'failed') {
             throw new ApiException("Response status is failed.", $response);
         }
 
-        return $json->getData();
+        return $json['data'];
     }
 }
