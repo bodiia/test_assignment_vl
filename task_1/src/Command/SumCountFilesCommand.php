@@ -34,7 +34,7 @@ final class SumCountFilesCommand extends Command
 
         try {
             $result = $this->getTotalSumOfNumbersInFiles($this->getFilesFromDirectories($directories, ['count']));
-        } catch (\InvalidArgumentException $exception) {
+        } catch (\UnexpectedValueException $exception) {
             $output->writeln($exception->getMessage());
 
             return Command::FAILURE;
@@ -58,7 +58,7 @@ final class SumCountFilesCommand extends Command
     {
         $excluded = [];
         for ($i = 0; $i < count($directories); $i++) {
-            for ($j = $i + 1; $j < count($directories); $j++) {
+            for ($j = 0; $j < count($directories); $j++) {
                 if ($directories[$i] === $directories[$j]) {
                     continue;
                 }
@@ -79,10 +79,6 @@ final class SumCountFilesCommand extends Command
 
         if (! $currentDirectory = array_shift($directories)) {
             return $files;
-        }
-
-        if (! file_exists($currentDirectory)) {
-            throw new \InvalidArgumentException("No such directory: $currentDirectory");
         }
 
         $directoryIterator = new \RecursiveIteratorIterator(
