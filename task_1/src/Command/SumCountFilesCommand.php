@@ -49,26 +49,21 @@ final class SumCountFilesCommand extends Command
     {
         $directoryPaths = [];
         foreach ($directories as $directory) {
-            $directoryPaths[] = Path::makeAbsolute($directory, __DIR__ . '/../../');
+            $directoryPaths[] = Path::makeAbsolute($directory, __DIR__ . '/../../') . DIRECTORY_SEPARATOR;
         }
         return $directoryPaths;
     }
 
     private function excludeRecurringDirectories(array $directories): array
     {
-        $explodedDirectoryPaths = array_map(static function (string $directory): array {
-            return explode(DIRECTORY_SEPARATOR, $directory);
-        }, $directories);
-
-        usort($explodedDirectoryPaths, static function (array $a, array $b): int {
-            return count($a) <=> count($b);
-        });
-
         $excluded = [];
-        for ($i = 0; $i < count($explodedDirectoryPaths); $i++) {
-            for ($j = $i + 1; $j < count($explodedDirectoryPaths); $j++) {
-                if (empty(array_diff($explodedDirectoryPaths[$i], $explodedDirectoryPaths[$j]))) {
-                    $excluded[] = implode(DIRECTORY_SEPARATOR, $explodedDirectoryPaths[$j]);
+        for ($i = 0; $i < count($directories); $i++) {
+            for ($j = $i + 1; $j < count($directories); $j++) {
+                if ($directories[$i] === $directories[$j]) {
+                    continue;
+                }
+                if (str_starts_with($directories[$j], $directories[$i])) {
+                    $excluded[] = $directories[$j];
                 }
             }
         }
